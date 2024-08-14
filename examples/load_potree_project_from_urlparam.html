@@ -64,6 +64,15 @@
 		} else {
 			console.log('Neither potreeProjectUrl not potreeProjectUrl url-params found, will not load any Potree Project')
 		}
+		
+		const fitToScreen = Potree.Utils.getParameterByName("fit")
+		if (fitToScreen) {
+			console.log('fitToScreen fit param present as urlparam')
+			setTimeout(() => {
+				viewer.fitToScreen()
+				console.log('viewer fitted to screen')
+			}, 2000)
+		}
 
 		viewer.loadGUI().then( () => {
 			viewer.setLanguage('en');
