@@ -41,12 +41,23 @@
 	
 		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 		
-		viewer.setDescription("This webapp parse url-params potreeProjectJson or potreeProjectUrl and loads the corresponding potree projects. Potree projects that were exported (Scene → Export → Potree) can be loaded with viewer.loadProject(url). ");
+		viewer.setDescription("This webapp parse url-params potreeDatasetUrl (or shortcut r), potreeProjectJson or potreeProjectUrl and loads the corresponding potree projects. Potree projects that were exported (Scene → Export → Potree) can be loaded with viewer.loadProject(url). ");
 		
 		const potreeProjectJson = Potree.Utils.getParameterByName("potreeProjectJson")
 		const potreeProjectUrl = Potree.Utils.getParameterByName("potreeProjectUrl")
 
-		if (potreeProjectUrl) {
+		const potreeDatasetUrl = Potree.Utils.getParameterByName("r") || Potree.Utils.getParameterByName("potreeDatasetUrl")
+		const activeAttributeName = Potree.Utils.getParameterByName("c")
+		
+		if (potreeDatasetUrl) {
+			Potree.loadPointCloud(potreeDatasetUrl, 'dataset', function(e){
+				viewer.scene.addPointCloud(e.pointcloud);
+				e.pointcloud.material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+				if (activeAttributeName) 
+					e.pointcloud.material.activeAttributeName = activeAttributeName;
+			})
+		}
+		else if (potreeProjectUrl) {
 			// ./resources/sorvilier.json"
 			console.log('Loading Potree Project from potreeProjectUrl', potreeProjectUrl)
 			viewer.loadProject(potreeProjectUrl).then( () => {
@@ -62,7 +73,7 @@
 				console.log("Potree project loaded from json!");
 			}
 		} else {
-			console.log('Neither potreeProjectUrl not potreeProjectUrl url-params found, will not load any Potree Project')
+			console.log('Neither potreeDatasetUrl (or shortcut r), nor potreeProjectUrl, nor potreeProjectUrl url-params found, will not load any Potree Project')
 		}
 		
 		const fitToScreen = Potree.Utils.getParameterByName("fit")
