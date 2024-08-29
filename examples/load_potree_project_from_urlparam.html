@@ -27,8 +27,9 @@
 	<script src="../libs/openlayers3/ol.js"></script>
 	<script src="../libs/i18next/i18next.js"></script>
 	<script src="../libs/jstree/jstree.js"></script>
-	<script src="../build/potree/potree.js"></script>
+	<script src="../libs/copc/index.js"></script>
 	<script src="../libs/plasio/js/laslaz.js"></script>
+	<script src="../build/potree/potree.js"></script>
 
 	<div class="potree_container" style="position: absolute; width: 100%; height: 100%; left: 0px; top: 0px; ">
 		<div id="potree_render_area" style="background-image: url('../build/potree/resources/images/background.jpg');"></div>
@@ -48,6 +49,7 @@
 
 		const potreeDatasetUrl = Potree.Utils.getParameterByName("r") || Potree.Utils.getParameterByName("potreeDatasetUrl")
 		const activeAttributeName = Potree.Utils.getParameterByName("c")
+		const fitToScreen = Potree.Utils.getParameterByName("fit")
 		
 		if (potreeDatasetUrl) {
 			Potree.loadPointCloud(potreeDatasetUrl, 'dataset', function(e){
@@ -55,10 +57,11 @@
 				e.pointcloud.material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
 				if (activeAttributeName) 
 					e.pointcloud.material.activeAttributeName = activeAttributeName;
+				if (fitToScreen) 
+					viewer.fitToScreen()
 			})
 		}
 		else if (potreeProjectUrl) {
-			// ./resources/sorvilier.json"
 			console.log('Loading Potree Project from potreeProjectUrl', potreeProjectUrl)
 			viewer.loadProject(potreeProjectUrl).then( () => {
 				console.log("Potree project loaded from url!");
@@ -76,13 +79,8 @@
 			console.log('Neither potreeDatasetUrl (or shortcut r), nor potreeProjectUrl, nor potreeProjectUrl url-params found, will not load any Potree Project')
 		}
 		
-		const fitToScreen = Potree.Utils.getParameterByName("fit")
-		if (fitToScreen) {
-			console.log('fitToScreen fit param present as urlparam')
-			setTimeout(() => {
-				viewer.fitToScreen()
-				console.log('viewer fitted to screen')
-			}, 2000)
+		if (fitToScreen && !potreeDatasetUrl) {
+			setTimeout(() => viewer.fitToScreen(), 2000)
 		}
 
 		viewer.loadGUI().then( () => {
