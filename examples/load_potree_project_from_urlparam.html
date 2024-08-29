@@ -93,6 +93,13 @@
 			$("#menu_tools").next().show();
 			viewer.toggleSidebar();
 		});
+		// Default settings 
+		viewer.setEDLEnabled(true);
+		viewer.setFOV(60);
+		viewer.setPointBudget(5_000_000);
+		// Load other params from url
+		viewer.loadSettingsFromURL();
+		// Available url-params: pointSize, FOV, opacity, edlEnabled, edlRadius, edlStrength, pointBudget, showBoundingBox, material, pointSizing, quality, position, target, background
 		
 	</script>
   </body>
