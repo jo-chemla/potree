@@ -42,24 +42,27 @@
 	
 		window.viewer = new Potree.Viewer(document.getElementById("potree_render_area"));
 		
-		viewer.setDescription("This webapp parse url-params potreeDatasetUrl (or shortcut r), potreeProjectJson or potreeProjectUrl and loads the corresponding potree projects. Potree projects that were exported (Scene → Export → Potree) can be loaded with viewer.loadProject(url). ");
+		viewer.setDescription("This webapp parse url-params datasetsUrls (json array [\"url1\", \"url2\"], or shortcut r), potreeProjectJson or potreeProjectUrl and loads the corresponding potree projects. Potree projects that were exported (Scene → Export → Potree) can be loaded with viewer.loadProject(url). ");
 		
 		const potreeProjectJson = Potree.Utils.getParameterByName("potreeProjectJson")
 		const potreeProjectUrl = Potree.Utils.getParameterByName("potreeProjectUrl")
 
-		const potreeDatasetUrl = Potree.Utils.getParameterByName("r") || Potree.Utils.getParameterByName("potreeDatasetUrl")
+		const potreeDatasetsUrls_str = Potree.Utils.getParameterByName("r") || Potree.Utils.getParameterByName("datasetsUrls")
 		const activeAttributeName = Potree.Utils.getParameterByName("c")
 		const fitToScreen = Potree.Utils.getParameterByName("fit")
 		
-		if (potreeDatasetUrl) {
-			Potree.loadPointCloud(potreeDatasetUrl, 'dataset', function(e){
-				viewer.scene.addPointCloud(e.pointcloud);
-				e.pointcloud.material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
-				if (activeAttributeName) 
-					e.pointcloud.material.activeAttributeName = activeAttributeName;
-				if (fitToScreen) 
-					viewer.fitToScreen()
-			})
+		if (potreeDatasetsUrls_str) {
+			const potreeDatasetsUrls = JSON.parse(potreeDatasetsUrls_str);
+			for (let potreeDatasetUrl of potreeDatasetsUrls) {
+				Potree.loadPointCloud(potreeDatasetUrl, 'dataset', function(e){
+					viewer.scene.addPointCloud(e.pointcloud);
+					e.pointcloud.material.pointSizeType = Potree.PointSizeType.ADAPTIVE;
+					if (activeAttributeName) 
+						e.pointcloud.material.activeAttributeName = activeAttributeName;
+					if (JSON.parse(fitToScreen)) 
+						viewer.fitToScreen()
+				})
+			}
 		}
 		else if (potreeProjectUrl) {
 			console.log('Loading Potree Project from potreeProjectUrl', potreeProjectUrl)
@@ -79,7 +82,7 @@
 			console.log('Neither potreeDatasetUrl (or shortcut r), nor potreeProjectUrl, nor potreeProjectUrl url-params found, will not load any Potree Project')
 		}
 		
-		if (fitToScreen && !potreeDatasetUrl) {
+		if (JSON.parse(fitToScreen) && !potreeDatasetsUrls_str) {
 			setTimeout(() => viewer.fitToScreen(), 2000)
 		}
 
